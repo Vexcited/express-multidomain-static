@@ -1,0 +1,16 @@
+{
+  "name": "express-disk-cdn",
+  "version": "0.0.1",
+  "description": "A CDN that serves content from a hard drive.",
+  "main": "src/index.js",
+  "repository": "https://github.com/Vexcited/express-disk-cdn",
+  "author": "Mikkel RINGAUD",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.17.2"
+  }
+}
