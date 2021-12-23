@@ -1,7 +1,6 @@
-const getDevicePath = require("./utils/getDevicePath");
-const express = require("express");
-const fs = require("fs").promises;
+const startServer = require("./app/startServer");
 
+// Check script compatibility.
 if (process.platform !== "linux") throw Error(
   "This CDN only supports 'linux' platforms.\n"
   + "To make this project more supported, please consider contributing to the project."
@@ -11,34 +10,31 @@ if (process.platform !== "linux") throw Error(
 const deviceName = process.argv[2];
 const arguments = process.argv.slice(3);
 
-// Start the Express CDN server.
-async function startServer (deviceName, arguments) {
-  const cdn = express();
-  
-  // Middlewares.
-  cdn.use(express.json());
-  cdn.use(express.urlencoded({ extended: false }));
+// Check if device was specified.
+if (!deviceName) throw Error(
+  "Device to deploy not specified !"
+);
 
-  const mountPoint = await getDevicePath(deviceName);
-  
-  cdn.get("/:fileName", async (req, res) => {
-    const { params: { fileName } } = req;
-    const { query: { folder } } = req;
+// Parse the argments by spliting them (chunks of 2).
+const parsedArgumentsArray = arguments.reduce((resultArray, item, index) => { 
+  const chunkIndex = Math.floor(index / 2);
 
-    const path = `${mountPoint}/${folder}/${fileName}`;
-    const file = await fs.readFile(path, { encoding: "base64" });
+  // Create a new chunk.
+  if (!resultArray[chunkIndex]) {
+    resultArray[chunkIndex] = [];
+  }
 
-    res.json({
-      success: true,
-      location: {
-        deviceName,
-        path
-      },
-      result: file
-    })
-  });
-  
-  cdn.listen(8090);
-}
+  // We convert strings to number if possible.
+  const value = isNaN(item) ? item : parseInt(item);
 
-startServer(deviceName, arguments);
+  // Add the value to the current chunk.
+  resultArray[chunkIndex].push(value);
+  return resultArray;
+}, []);
+
+// Convert the parsed arguments to an object.
+const parsedArguments = parsedArgumentsArray.reduce((obj, item) => (obj[item[0].replace(/-/g, "")] = item[1], obj), {});
+
+// Start the server with the given device to deploy
+// and with the optional parameters.
+startServer(deviceName, parsedArguments);
