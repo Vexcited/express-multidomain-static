@@ -9,7 +9,7 @@ const generateToken = () => crypto
   .toString("base64")
   .replace(/\+/g, "-")
   .replace(/\//g, "_")
-  .replace(/\=/g, "");
+  .replace(/=/g, "");
 
 export default async function authToken () {
   const tokenFilePath = path.join(__dirname, "../../token.json");

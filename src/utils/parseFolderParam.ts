@@ -12,4 +12,4 @@ export default function parseFolderParam (folder: string) {
   if (folder[folder.length - 1] !== "/") folder.concat("/");
 
   return folder;
-} 
+}

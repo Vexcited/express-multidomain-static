@@ -11,7 +11,8 @@
   "scripts": {
     "dev": "nodemon --config nodemon.json src/index.ts",
     "start": "node dist/index.js",
-    "build": "rimraf ./dist && tsc"
+    "build": "yarn lint && rimraf ./dist && tsc",
+    "lint": "eslint . --ext .ts"
   },
   "dependencies": {
     "express": "^4.17.2"
@@ -19,6 +20,9 @@
   "devDependencies": {
     "@types/express": "^4.17.13",
     "@types/node": "^17.0.4",
+    "@typescript-eslint/eslint-plugin": "^5.8.0",
+    "@typescript-eslint/parser": "^5.8.0",
+    "eslint": "^8.5.0",
     "nodemon": "^2.0.15",
     "rimraf": "^3.0.2",
     "ts-node": "^10.4.0",

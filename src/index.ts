@@ -4,7 +4,7 @@ import startServer from "./app/startServer.js";
 if (process.platform !== "linux") throw Error(
   "This CDN only supports 'linux' platforms.\n"
   + "To make this project more supported, please consider contributing to the project."
-)
+);
 
 // Structure: [nodeBin, scriptPath, deviceName, ...args].
 const deviceName = process.argv[2];
@@ -20,9 +20,9 @@ const parsedArgumentsArray = args.reduce((
   resultArray: [string, (string | number)][],
   item,
   index
-) => { 
+) => {
   const chunkIndex = Math.floor(index / 2);
-  
+
   // Create a new chunk.
   if (!resultArray[chunkIndex]) {
     // We set a temporary empty value to not mess it up in the object.
@@ -52,7 +52,7 @@ const convertArrayToObject = (
   // Define the argument in the object.
   finalObject[key] = value;
   return finalObject;
-}
+};
 const parsedArguments = parsedArgumentsArray.reduce(convertArrayToObject, {});
 
 // Start the server with the given device to deploy

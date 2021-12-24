@@ -13,7 +13,7 @@ export default async function createHostnameFolder (
 
     return {
       result: true
-    }
+    };
   }
   catch (error) {
     return {

@@ -13,7 +13,7 @@ import express from "express";
 export default async function startServer (deviceName: string, args: CliArguments) {
   const cdn = express();
   const token = await authToken();
-  
+
   // Middlewares.
   cdn.use(express.json());
   cdn.use(express.urlencoded({ extended: false }));
