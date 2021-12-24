@@ -61,7 +61,7 @@ We'll use `domain.com` hostname, for these examples. \
 Also imagine you have a `image.png` in `/mnt/my_disk/domain.com`
 and `random_name.json` in `/mnt/my_disk/domain.com/products`.
 
-### `GET /raw/:fileName[?folder=/]
+### `GET /raw/:fileName[?folder=/]`
 
 - GET `/raw/image.png`
   - This will give you the `image.png` file raw like it is.
@@ -79,12 +79,25 @@ interface GetRawErrorResponse {
 }
 ```
 
-### `GET /data/:fileName[?folder=/]
+### `GET /data/:fileName[?folder=/]`
 
 - GET `/data/image.png`
   - This will give you the Base64 Encoded content of `image.png` with also informations about the parsed name and folder.
 - GET `/raw/random_name.json?folder=products/`
   - Does the same thing but in the `products` subfolder.
+
+#### Successful Response
+
+```typescript
+interface GetDataResponse {
+  success: true;
+  informations: {
+    name: string; // File's parsed name.
+    subFolder?: string; // Subfolder's parsed name.
+  };
+  data: string; // File encoded in Base64.
+}
+```
 
 #### Error Response
 
@@ -92,10 +105,10 @@ interface GetRawErrorResponse {
 interface GetDataErrorResponse {
   success: false;
   message: string;
-  error: any;
+  error?: any;
 }
 ```
-### `POST /data/:fileName[?folder=/]
+### `POST /data/:fileName[?folder=/]`
 
 You need to set the `Content-Type` header to `application/json` and also specify your token in the `Authorization` header (eg.: `"Authorization": "Bearer MY_TOKEN_HERE"`).
 
@@ -116,11 +129,8 @@ const body = {
 ```typescript
 interface PostDataResponse {
   success: true;
-  informations: {
-    name: string; // 
-    subFolder?: string;
-  };
-  data: string; // Base64 Encoded.
+  filePath: string; // Path on the server for debugging purposes.
+  url: string; // URL where it has been deployed.
 }
 ```
 
@@ -130,7 +140,7 @@ interface PostDataResponse {
 interface PostDataErrorResponse {
   success: false;
   message: string;
-  error: any;
+  error?: any;
 }
 ```
 
