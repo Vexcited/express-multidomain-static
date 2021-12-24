@@ -6,7 +6,7 @@
 
 ```bash
 # Make sure you have Node.js and Yarn installed.
-node -v
+node -v # Should be >= 14
 yarn -v
 
 # Clone this repository.
@@ -39,71 +39,103 @@ The API is configured to run on `0.0.0.0:8090` by default. You can change it by 
 yarn start /dev/sda1 --port 4050
 ```
 
-## How does it work ?
+A authentication token will be generated in the `token.json` file. It will be used to update or create content through the API.
+To reset it, simply delete it and restart the server, it will generate a new one.
 
-Clean your disk. Now you'll create folders.
+## Explaining with an example
 
+Imagine you have deployed your disk `/dev/sda1` to this domain `assets.example.com`.
 
-So, you'll need the drive name. Using `lsblk`, I can know that mine is `/dev/sda1`. By the way, don't forget to mount it !
-
-Now, you deploy your CDN using `yarn start /dev/sda1 --port 9090`, and you realize, how do you import content to your drive and where it is stored?
-
-Firstly, the folder where all the content for this domain is named exactly the same as the domain. Using the example before (`assets.example.com`), the folder created that we'll be used to store content will be named `assets.example.com` too !
-
-Then, it means that you can manually import content to your CDN by moving files to this directory.
-
-Now, how do you access to, for example, a picture "image.png" that was moved to the `assets.example.com` folder.
-- Simply navigate to it `assets.example.com/raw/image.png`
-  - This URL will give you the image as is, without any compression, etc...
+How can you upload content to it ?
+- Use the API with your authentication token stored in `token.json`.
+  - Simply make a `POST` request to `/data/your_file_name.json` with a `application/json` content-type body which contains the data of what you want to upload (`{ "content": "base64_string_here" }`).
+  - It's uploaded ! You can now access it with `/raw/your_file_name.json` or `/data/your_file_name.json`.
+- Use an FTP and paste files into the domain's folder.
+  - **Example** - You deployed the disk `/dev/sda1` which is mounted at `/mnt/my_external_disk`.
+  - In this example, you'll upload your files to `/mnt/my_external_disk/assets.example.com`.
+  - You can now access these files with `/raw/your_file_name.fileExtension` or `/data/your_file_name.fileExtension`.
 
 ## API
 
-The deployed CDN gives a basic API.
-We'll use `domain.com` as the CDN URL, for these examples.
+We'll use `domain.com` hostname, for these examples. \
+Also imagine you have a `image.png` in `/mnt/my_disk/domain.com`
+and `random_name.json` in `/mnt/my_disk/domain.com/products`.
 
-### Access content
+### `GET /raw/:fileName[?folder=/]
 
-We have contents in the `domain.com` folder, and want to access it. What are the differents methods to proceed ?
+- GET `/raw/image.png`
+  - This will give you the `image.png` file raw like it is.
+- GET `/raw/random_name.json?folder=products/
+  - This will give you the `random_name.json` file into the `products` folder.
+  - Note: You can also have multiple folders like this: `?folder=/products/data/images/`
+    - Note: The trailling slash at the start and at the end are **not required**.
 
-- `/raw/image.png`
-  - This will give you a file without any modification.
-- `/data/image.png`
-  - This will return a JSON file, which is structured like this...
+#### Error Response
 
 ```typescript
-{
-  file: {
-    fullName: string;
-    mime: string;
-    size: number; // In bytes.
-  },
-  data: string; // Base64 Encoded Content.
+interface GetRawErrorResponse {
+  success: false;
+  message: string;
 }
 ```
 
-### Update/Create content
+### `GET /data/:fileName[?folder=/]
 
-You need to make a `POST` request to `/upload`, with the file content in it.
+- GET `/data/image.png`
+  - This will give you the Base64 Encoded content of `image.png` with also informations about the parsed name and folder.
+- GET `/raw/random_name.json?folder=products/`
+  - Does the same thing but in the `products` subfolder.
 
-By the way, you need to authenticate in this one using a custom header.
+#### Error Response
 
-Headers
 ```typescript
-headers: {
-  "Authorization": `Bearer {your_token}`
+interface GetDataErrorResponse {
+  success: false;
+  message: string;
+  error: any;
+}
+```
+### `POST /data/:fileName[?folder=/]
+
+You need to set the `Content-Type` header to `application/json` and also specify your token in the `Authorization` header (eg.: `"Authorization": "Bearer MY_TOKEN_HERE"`).
+
+The content of the file needs to be specified in the request's body in the `content` property with a value encoded in Base64. 
+
+```typescript
+/** Request's body. */
+const body = {
+  content: btoa("Hello, world !"); // Encode in Base64.
+};
+```
+
+- POST `/data/random_name.json?folder=products/`
+  - Edits or creates the file `random_name.json` under the subfolder `products`. 
+
+#### Successful Response
+
+```typescript
+interface PostDataResponse {
+  success: true;
+  informations: {
+    name: string; // 
+    subFolder?: string;
+  };
+  data: string; // Base64 Encoded.
 }
 ```
 
-POST Payload to `/upload`.
+#### Error Response
 
 ```typescript
-{
-  fileName: string;
-  content: string; // File Content Enconded in Base64.
+interface PostDataErrorResponse {
+  success: false;
+  message: string;
+  error: any;
 }
+```
 
-### How to have the authentication token
+## Scripts
 
-When you run the script for the first time, you'll see a file `token.json` that will be created.
-The authentication token will be in it.
-You can reset your authentication token by deleting the file and restarting the script.
+- `dev` => Runs `nodemon` with `ts-node` in development mode.
+- `build` => Builds the TypeScript code and outputs to `dist` folder.
+- `start` => Starts the bundled script (`dist/index.js`). 
