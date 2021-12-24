@@ -26,6 +26,6 @@ export default async function startServer (deviceName: string, args: CliArgument
   const PORT = args.port || 8090;
   cdn.listen(PORT, () => console.info(
     `Your CDN is currently listening on port ${PORT}.\n`
-    + "* Documentation: https://github.com/Vexcited/express-disk-cdn"
+    + "* Documentation: https://github.com/Vexcited/express-disk-deploy"
   ));
 }
