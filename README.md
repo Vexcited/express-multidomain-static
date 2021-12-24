@@ -167,7 +167,10 @@ pm2 startup
 
 # Start the application
 # Make sure to have bundled it using "yarn build" before.
-pm2 start dist/index.js --name YOUR_APP_NAME -- --port 8090
+# Replace "YOUR_APP_NAME" with the name of your choice.
+# Replace also "/dev/sda1" by the name of your device.
+# Replace the port "8090" if you want to change it.
+pm2 start dist/index.js --name YOUR_APP_NAME -- /dev/sda1 --port 8090
 
 # Now you can save the process to make it start at boot.
 pm2 save
