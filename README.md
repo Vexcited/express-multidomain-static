@@ -1,10 +1,6 @@
-# Express Disk CDN
+# express-disk-deploy
 
-> Make any external disk, a CDN with the power of an API made with Express.
-
-With this, you can turn any hard drive, usb, etc.. to a CDN.
-
-![Preview CDN](./docs/assets/cdn-preview.png)
+> Make any external disk (external hard drive, USB stick, ...) a static content hosting server with an integrated API made with the power of Express.
 
 ## Installation
 
@@ -14,18 +10,25 @@ node -v
 yarn -v
 
 # Clone this repository.
-git clone https://github.com/Vexcited/express-disk-cdn
+git clone https://github.com/Vexcited/express-disk-deploy
 
 # Go into the project folder.
-cd express-disk-cdn
+cd express-disk-deploy
 
 # Install dependencies.
 yarn
 
-# Start the CDN server and pass as argument, the device to be used as CDN.
-# Here, my external hard drive is /dev/sda1.
+# Build the app.
+yarn build
+
+# Start the server and pass as argument the device to be used deployed.
+# Here, my external hard drive's name is /dev/sda1. (By the way, it needs to be mounted !)
 # You can know it by running `lsblk`
-yarn start /dev/sda1
+yarn start /dev/sda1 --port 8090 # Default port is 8090.
+
+# A `token.json` file is created and it stores your API token
+# to use when uploading/editing content.
+cat token.json # Shows the content of the file.
 ```
 
 ## Usage
@@ -38,8 +41,8 @@ yarn start /dev/sda1 --port 4050
 
 ## How does it work ?
 
-Imagine you have a clean external hard drive.
-You connect it to your Linux server, and want to make it a CDN for your random website. You're gonna deploy this CDN to this domain: `assets.example.com`, for example.
+Clean your disk. Now you'll create folders.
+
 
 So, you'll need the drive name. Using `lsblk`, I can know that mine is `/dev/sda1`. By the way, don't forget to mount it !
 
