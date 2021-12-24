@@ -149,3 +149,43 @@ interface PostDataErrorResponse {
 - `dev` => Runs `nodemon` with `ts-node` in development mode.
 - `build` => Builds the TypeScript code and outputs to `dist` folder.
 - `start` => Starts the bundled script (`dist/index.js`). 
+- `lint` => Lint the code with `eslint`.
+
+## Deploy with `pm2`
+
+You can easily deploy this with `pm2`.
+
+```bash
+# Install PM2
+yarn global add pm2
+
+# Allow it to start automatically at boot.
+# It will give you some code to paste.
+pm2 startup
+
+# Paste code to allow startup.
+
+# Start the application
+# Make sure to have bundled it using "yarn build" before.
+pm2 start dist/index.js --name YOUR_APP_NAME -- --port 8090
+
+# Now you can save the process to make it start at boot.
+pm2 save
+
+# Also, you can monitor and check the running process
+pm2 status
+
+# Reload the process
+pm2 reload YOUR_APP_NAME
+
+# Restart the process
+pm2 restart YOUR_APP_NAME
+
+# Stop the process
+pm2 stop YOUR_APP_NAME
+
+# Delete the process
+pm2 delete YOUR_APP_NAME
+```
+
+You can find more informations about PM2 on their official documentation <https://pm2.keymetrics.io/docs/usage/quick-start>.
