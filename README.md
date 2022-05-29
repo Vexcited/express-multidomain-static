@@ -5,9 +5,9 @@
 ## Installation
 
 ```bash
-# Make sure you have Node.js and Yarn installed.
+# Make sure you have Node.js and PNPm installed.
 node -v # Should be >= 14
-yarn -v
+pnpm -v # Can be installed with `npm install --global pnpm`
 
 # Clone this repository.
 git clone https://github.com/Vexcited/express-multidomain-static
@@ -35,10 +35,10 @@ cat token.json # Shows the content of the file.
 The API is configured to run on `0.0.0.0:8090` by default. You can change it by running the port argument.
 
 ```bash
-yarn start /dev/sda1 --port 4050
+pnpm start /mnt/static_domains --port 4050
 ```
 
-A authentication token will be generated in the `token.json` file. It will be used to update or create content through the API.
+An authentication token will be generated in the `token.json` file. It will be used to update or create content through the API.
 To reset it, simply delete it and restart the server, it will generate a new one.
 
 ## Explaining with an example
@@ -128,7 +128,8 @@ const body = {
 interface PostDataResponse {
   success: true;
   filePath: string; // Path on the server for debugging purposes.
-  url: string; // URL where it has been deployed.
+  raw_url: string; // URL for raw.
+  data_url: string; // URL for data.
 }
 ```
 
