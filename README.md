@@ -1,6 +1,6 @@
-# express-disk-deploy
+# express-multidomain-static
 
-> Make any external disk (external hard drive, USB stick, ...) a static content hosting server with an integrated API made with the power of Express.
+> Host static content for multiple domains in a specific folder.
 
 ## Installation
 
@@ -10,21 +10,20 @@ node -v # Should be >= 14
 yarn -v
 
 # Clone this repository.
-git clone https://github.com/Vexcited/express-disk-deploy
+git clone https://github.com/Vexcited/express-multidomain-static
 
 # Go into the project folder.
-cd express-disk-deploy
+cd express-multidomain-static
 
 # Install dependencies.
-yarn
+pnpm install
 
-# Build the app.
-yarn build
+# Build the code.
+pnpm build
 
-# Start the server and pass as argument the device to be used deployed.
-# Here, my external hard drive's name is /dev/sda1. (By the way, it needs to be mounted !)
-# You can know it by running `lsblk`
-yarn start /dev/sda1 --port 8090 # Default port is 8090.
+# Start the server and pass as argument the root folder to be used.
+# Here, I will use my external hard drive which is mounted on `/mnt/static_domains`.
+pnpm start /mnt/static_domains --port 8090 # Default port is 8090.
 
 # A `token.json` file is created and it stores your API token
 # to use when uploading/editing content.
@@ -44,22 +43,21 @@ To reset it, simply delete it and restart the server, it will generate a new one
 
 ## Explaining with an example
 
-Imagine you have deployed your disk `/dev/sda1` to this domain `assets.example.com`.
+Imagine you have a folder at `/home/static/domains` and you own the domain `assets.example.com`.
 
 How can you upload content to it ?
-- Use the API with your authentication token stored in `token.json`.
+- Use the API with your authentication token stored in `token.json`, in the header of the request (`"Authorization": "Bearer <TOKEN>"`)
   - Simply make a `POST` request to `/data/your_file_name.json` with a `application/json` content-type body which contains the data of what you want to upload (`{ "content": "base64_string_here" }`).
   - It's uploaded ! You can now access it with `/raw/your_file_name.json` or `/data/your_file_name.json`.
-- Use an FTP and paste files into the domain's folder.
-  - **Example** - You deployed the disk `/dev/sda1` which is mounted at `/mnt/my_external_disk`.
-  - In this example, you'll upload your files to `/mnt/my_external_disk/assets.example.com`.
+- Use an FTP and upload files into the domain's folder.
+  - In this example, you'll upload your files to `/home/static/domains/assets.example.com`.
   - You can now access these files with `/raw/your_file_name.fileExtension` or `/data/your_file_name.fileExtension`.
 
 ## API
 
 We'll use `domain.com` hostname, for these examples. \
-Also imagine you have a `image.png` in `/mnt/my_disk/domain.com`
-and `random_name.json` in `/mnt/my_disk/domain.com/products`.
+Also imagine you have a `image.png` in `/home/static/domains/domain.com`
+and `random_name.json` in `/home/static/domains/domain.com/products`.
 
 ### `GET /raw/:fileName[?folder=/]`
 
@@ -149,7 +147,7 @@ interface PostDataErrorResponse {
 - `dev` => Runs `nodemon` with `ts-node` in development mode.
 - `build` => Builds the TypeScript code and outputs to `dist` folder.
 - `start` => Starts the bundled script (`dist/index.js`). 
-- `lint` => Lint the code with `eslint`.
+- `lint` => Lints the code with `eslint`.
 
 ## Deploy with `pm2`
 
@@ -157,13 +155,13 @@ You can easily deploy this with `pm2`.
 
 ```bash
 # Install PM2
-yarn global add pm2
+npm install --global pm2
 
 # Allow it to start automatically at boot.
 # It will give you some code to paste.
 pm2 startup
 
-# Paste code to allow startup.
+# Paste code given from PM2 to allow execution on startup.
 
 # Start the application
 # Make sure to have bundled it using "yarn build" before.
