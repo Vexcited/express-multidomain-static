@@ -1,6 +1,6 @@
-import createHostnameFolder from "../utils/createHostnameFolder.js";
 import parseFolderParam from "../utils/parseFolderParam.js";
 import parseFileName from "../utils/parseFileName.js";
+import createFolder from "../utils/createFolder.js";
 import express from "express";
 import fs from "fs/promises";
 import path from "path";
@@ -9,15 +9,15 @@ import path from "path";
 const router = express.Router();
 
 /**
- * Creates the routes for Express.
- * @param {string} mountPoint - Device's mount point path.
- * @param {string} token - Token generated stored in `token.json`.
+ * Create the routes for Express.
+ * @param root_folder_path - Device's mount point path.
+ * @param token - Token generated stored in `token.json`.
  */
-export default function createRoutes (mountPoint: string, token: string) {
+export default function createRoutes (root_folder_path: string, token: string) {
   /** Check if the hostname folder exists. */
   router.use(async (req, res, next) => {
     try {
-      await createHostnameFolder(mountPoint, req.hostname);
+      await createFolder(root_folder_path, req.hostname);
       next();
     }
     catch (error) {
@@ -43,7 +43,7 @@ export default function createRoutes (mountPoint: string, token: string) {
     const folder = req.query.folder ? parseFolderParam(req.query.folder as string) : "";
 
     res.status(200).sendFile(parseFileName(fileName), {
-      root: path.join(mountPoint, hostname, folder)
+      root: path.join(root_folder_path, hostname, folder)
     }, (error) => {
       if (error) {
         res.status(404).json({
@@ -73,7 +73,7 @@ export default function createRoutes (mountPoint: string, token: string) {
         // Optional folder query.
         const folder = req.query.folder ? parseFolderParam(req.query.folder as string) : "";
 
-        const filePath = path.join(mountPoint, hostname, folder, cleanedFileName);
+        const filePath = path.join(root_folder_path, hostname, folder, cleanedFileName);
         const fileData = await fs.readFile(filePath, {
           encoding: "base64"
         });
@@ -133,16 +133,17 @@ export default function createRoutes (mountPoint: string, token: string) {
         }
 
         /** Optional custom sub-folder. If it doesn't exist, we just set an empty variable. */
-        let folder = req.query.folder as string || "", folderPath = path.join(mountPoint, hostname);
+        let folder = req.query.folder as string || "";
+        let folderPath = path.join(root_folder_path, hostname);
         if (folder) {
-        // We parse the query.
+          // We parse the query.
           folder = parseFolderParam(folder);
 
-          // Know the full folder path and store it.
-          folderPath = path.join(mountPoint, hostname, folder);
-
           // We create the folder if it doesn't exist.
-          await fs.mkdir(folderPath, { recursive: true });
+          await createFolder(folderPath, folder);
+
+          // Know the full folder path and store it.
+          folderPath = path.join(folderPath, folder);
         }
 
         // Get the full path for the final file.
@@ -154,10 +155,13 @@ export default function createRoutes (mountPoint: string, token: string) {
           encoding: "base64"
         });
 
+        const sub_url = `${cleanedFileName}${folder ? `?folder=${folder}` : ""}`;
+
         res.status(200).json({
           success: true,
           filePath,
-          url: `/raw/${cleanedFileName}${folder ? `?folder=${folder}` : ""}`
+          url_raw: `/raw/${sub_url}`,
+          url_data: `/data/${sub_url}`
         });
       }
       catch (error) {

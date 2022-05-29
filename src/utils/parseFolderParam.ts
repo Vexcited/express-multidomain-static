@@ -1,5 +1,5 @@
 export default function parseFolderParam (folder: string) {
-  // Replace every not letters or "/" by "-".
+  // Replace every not(letters and "/") by "-".
   folder = folder.replace(/[^\w/]/g, "-");
 
   // Replace every consecutive "/" to only one.

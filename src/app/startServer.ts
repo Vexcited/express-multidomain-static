@@ -1,31 +1,29 @@
-import type { CliArguments } from "../types";
+import type { ParsedArgs } from "minimist";
 
-import getDevicePath from "../utils/getDevicePath.js";
 import authToken from "../utils/authToken.js";
 import createRoutes from "./routes.js";
 import express from "express";
 
 /**
- * Start the CDN server.
- * @param {string} deviceName - Device to find, example: `/dev/sda1`.
- * @param {CliArguments} args - Arguments of the CLI.
+ * Start the express server.
+ * @param root_folder_path - Device to find, example: `/dev/sda1`.
+ * @param args - Arguments of the CLI.
  */
-export default async function startServer (deviceName: string, args: CliArguments) {
-  const cdn = express();
+export default async function startServer (root_folder_path: string, args: ParsedArgs) {
+  const server = express();
   const token = await authToken();
 
   // Middlewares.
-  cdn.use(express.json());
-  cdn.use(express.urlencoded({ extended: false }));
+  server.use(express.json());
+  server.use(express.urlencoded({ extended: false }));
 
   // Create API routes.
-  const mountPoint = await getDevicePath(deviceName);
-  const routes = createRoutes(mountPoint, token);
-  cdn.use(routes);
+  const routes = createRoutes(root_folder_path, token);
+  server.use(routes);
 
   const PORT = args.port || 8090;
-  cdn.listen(PORT, () => console.info(
-    `Your CDN is currently listening on port ${PORT}.\n`
-    + "* Documentation: https://github.com/Vexcited/express-disk-deploy"
+  server.listen(PORT, () => console.info(
+    `Currently listening on port ${PORT}.\n`
+    + "* Documentation: https://github.com/Vexcited/express-multidomain-static"
   ));
 }

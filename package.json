@@ -1,8 +1,8 @@
 {
-  "name": "express-disk-cdn",
-  "version": "0.0.1",
-  "description": "A CDN that serves content from a hard drive.",
-  "main": "src/index.js",
+  "name": "express-multidomain-static",
+  "version": "0.2.0",
+  "description": "Host static content for multiple domains in a specific folder.",
+  "main": "dist/index.js",
   "type": "module",
   "repository": "https://github.com/Vexcited/express-disk-cdn",
   "author": "Mikkel RINGAUD",
@@ -11,14 +11,16 @@
   "scripts": {
     "dev": "nodemon --config nodemon.json src/index.ts",
     "start": "node dist/index.js",
-    "build": "yarn lint && rimraf ./dist && tsc",
-    "lint": "eslint . --ext .ts"
+    "build": "pnpm lint && rimraf ./dist && tsc",
+    "lint": "eslint ./src --ext .ts"
   },
   "dependencies": {
-    "express": "^4.17.2"
+    "express": "^4.17.2",
+    "minimist": "^1.2.6"
   },
   "devDependencies": {
     "@types/express": "^4.17.13",
+    "@types/minimist": "^1.2.2",
     "@types/node": "^17.0.4",
     "@typescript-eslint/eslint-plugin": "^5.8.0",
     "@typescript-eslint/parser": "^5.8.0",
